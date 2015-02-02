@@ -142,6 +142,8 @@ func build(builder gin.Builder, runner gin.Runner, logger *log.Logger) {
 		logger.Println("ERROR! Build failed.")
 		fmt.Println(builder.Errors())
 	} else {
+		// NOTE: Trigger livereload only when everything is built
+
 		// print success only if there were errors before
 		if buildError != nil {
 			logger.Println("Build Successful")
@@ -169,7 +171,10 @@ func scanChanges(watchPath string, cb scanCallback) {
 				return nil
 			}
 
-			if filepath.Ext(path) == ".go" && info.ModTime().After(startTime) {
+			// NOTE: Removed the condition to reload only if it was a ´.go´ file.
+			// Seems natural for web-dev that it reloads also if images, css, js, etc. changes.
+
+			if info.ModTime().After(startTime) {
 				cb(path)
 				startTime = time.Now()
 				return errors.New("done")
